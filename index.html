@@ -742,7 +742,7 @@
         </form>
         <section class="sync-panel" aria-labelledby="syncTitle">
           <h2 id="syncTitle">Firebase 同步</h2>
-          <p class="progress-hint">登入後按「存檔上傳」會同步到 Firestore 的 <strong>whatToDo/{uid}</strong>。Firebase 已內建設定。</p>
+          <p class="progress-hint">登入後按「存檔上傳」會同步到 Firestore 的 <strong>whatToDo/{uid}/tasks</strong>。Firebase 已內建設定。</p>
           <div class="form-grid">
             <label>
               Email
@@ -823,6 +823,7 @@
         user: null,
         db: null,
         docRef: null,
+        tasksRef: null,
         modules: null
       }
     };
@@ -1134,6 +1135,33 @@
       render();
     }
 
+    function normalizeCloudTask(task, fallbackId = crypto.randomUUID()) {
+      return {
+        id: String(task.id || fallbackId),
+        title: String(task.title || ""),
+        note: String(task.note || ""),
+        next: String(task.next || ""),
+        category: String(task.category || ""),
+        status: ["paused", "active", "blocked", "done"].includes(task.status) ? task.status : "paused",
+        progress: clampProgress(task.progress),
+        tags: Array.isArray(task.tags) ? task.tags.map(String) : [],
+        updatedAt: task.updatedAt || new Date().toISOString()
+      };
+    }
+
+    function taskDocId(task) {
+      return encodeURIComponent(String(task.id || crypto.randomUUID()));
+    }
+
+    async function commitFirestoreWrites(modules, writes) {
+      const chunkSize = 450;
+      for (let index = 0; index < writes.length; index += chunkSize) {
+        const batch = modules.writeBatch(state.firebase.db);
+        writes.slice(index, index + chunkSize).forEach((write) => write(batch));
+        await batch.commit();
+      }
+    }
+
     async function initFirebase() {
       const modules = await loadFirebaseModules();
       state.firebase.app = modules.getApps().some((app) => app.name === "what-to-do-app")
@@ -1149,6 +1177,9 @@
       state.firebase.enabled = Boolean(user);
       state.firebase.docRef = user && state.firebase.modules
         ? state.firebase.modules.doc(state.firebase.db, "whatToDo", user.uid)
+        : null;
+      state.firebase.tasksRef = user && state.firebase.modules
+        ? state.firebase.modules.collection(state.firebase.db, "whatToDo", user.uid, "tasks")
         : null;
     }
 
@@ -1166,24 +1197,66 @@
     async function pushFirebaseSync() {
       if (state.firebase.applyingRemote) return;
       const modules = await ensureFirebaseLogin();
-      const payload = {
-        ...currentPayload(),
-        updatedAt: new Date().toISOString(),
+      const updatedAt = new Date().toISOString();
+      const metaPayload = {
+        app: "What to do",
+        version: 2,
+        storage: "tasks-subcollection",
+        categories: categories(),
+        tags: tags(),
+        taskCount: state.tasks.length,
+        updatedAt,
         deviceId: deviceId(),
         ownerUid: state.firebase.user.uid,
         ownerEmail: state.firebase.user.email || ""
       };
-      await modules.setDoc(state.firebase.docRef, payload);
-      setSyncStatus(`雲端已更新：${formatDate(payload.updatedAt)}`);
+      const cloudTasks = await modules.getDocs(state.firebase.tasksRef);
+      const localIds = new Set(state.tasks.map(taskDocId));
+      const writes = [
+        (batch) => batch.set(state.firebase.docRef, metaPayload)
+      ];
+
+      cloudTasks.forEach((docSnap) => {
+        if (!localIds.has(docSnap.id)) {
+          writes.push((batch) => batch.delete(docSnap.ref));
+        }
+      });
+
+      state.tasks.forEach((task) => {
+        const normalized = normalizeCloudTask(task);
+        writes.push((batch) => batch.set(
+          modules.doc(state.firebase.tasksRef, taskDocId(normalized)),
+          normalized
+        ));
+      });
+
+      await commitFirestoreWrites(modules, writes);
+      setSyncStatus(`雲端已更新：${formatDate(updatedAt)}，共 ${state.tasks.length} 筆`);
     }
 
     async function loadCloudSync() {
       const modules = await ensureFirebaseLogin();
-      const snapshot = await modules.getDoc(state.firebase.docRef);
-      if (snapshot.exists()) {
-        const remote = snapshot.data();
+      const [metaSnapshot, tasksSnapshot] = await Promise.all([
+        modules.getDoc(state.firebase.docRef),
+        modules.getDocs(state.firebase.tasksRef)
+      ]);
+      if (!tasksSnapshot.empty) {
+        const meta = metaSnapshot.exists() ? metaSnapshot.data() : {};
+        const remoteTasks = [];
+        tasksSnapshot.forEach((docSnap) => {
+          remoteTasks.push(normalizeCloudTask(docSnap.data(), decodeURIComponent(docSnap.id)));
+        });
+        applyCloudPayload({
+          tasks: remoteTasks,
+          categories: meta.categories,
+          tags: meta.tags,
+          updatedAt: meta.updatedAt
+        });
+        setSyncStatus(`已套用雲端資料：${formatDate(meta.updatedAt)}，共 ${remoteTasks.length} 筆`);
+      } else if (metaSnapshot.exists() && Array.isArray(metaSnapshot.data().tasks)) {
+        const remote = metaSnapshot.data();
         applyCloudPayload(remote);
-        setSyncStatus(`已套用雲端資料：${formatDate(remote.updatedAt)}`);
+        setSyncStatus(`已套用舊版雲端備份：${formatDate(remote.updatedAt)}`);
       } else {
         setSyncStatus("雲端目前沒有資料。");
       }
@@ -1210,6 +1283,7 @@
       if (state.firebase.auth) state.firebase.modules?.signOut(state.firebase.auth).catch(() => {});
       state.firebase.enabled = false;
       state.firebase.docRef = null;
+      state.firebase.tasksRef = null;
       state.firebase.user = null;
       setSyncStatus("已登出");
     }
