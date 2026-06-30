@@ -969,11 +969,6 @@
       } catch {
         backupStatus.textContent = "自動備份失敗，請重新啟用";
       }
-      try {
-        await pushFirebaseSync();
-      } catch (error) {
-        setSyncStatus(firebaseErrorMessage(error));
-      }
       if (message) showToast(message);
     }
 
@@ -1091,24 +1086,31 @@
 
     function firebaseErrorMessage(error) {
       const code = error?.code || "unknown";
+      const details = error?.message ? ` (${error.message})` : "";
       if (code === "permission-denied") {
         return "Firestore 規則擋住了，請確認 rules 是 whatToDo/{userId} 且 request.auth.uid == userId。";
       }
-      if (code === "unauthenticated") {
+      if (code === "unauthenticated" || code === "auth/user-token-expired") {
         return "登入狀態已失效，請重新登入。";
+      }
+      if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found") {
+        return "登入失敗，Email 或 Password 不正確，或 Firebase Authentication 尚未建立這個使用者。";
+      }
+      if (code === "auth/operation-not-allowed") {
+        return "登入失敗，請到 Firebase Authentication 開啟 Email/Password。";
       }
       if (code === "unavailable") {
         return "Firebase 暫時連不上，請稍後再試或檢查網路。";
       }
-      return `Firebase 錯誤：${code}`;
+      return `Firebase 錯誤：${code}${details}`;
     }
 
     async function loadFirebaseModules() {
       if (state.firebase.modules) return state.firebase.modules;
 
-      const appModule = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js");
-      const authModule = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js");
-      const firestoreModule = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js");
+      const appModule = await import("https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js");
+      const authModule = await import("https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js");
+      const firestoreModule = await import("https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js");
       state.firebase.modules = { ...appModule, ...authModule, ...firestoreModule };
       return state.firebase.modules;
     }
@@ -1124,25 +1126,6 @@
       render();
     }
 
-    async function pushFirebaseSync() {
-      if (!state.firebase.enabled || state.firebase.applyingRemote || !state.firebase.user || !state.firebase.docRef || !state.firebase.modules) return;
-
-      const payload = {
-        ...currentPayload(),
-        updatedAt: new Date().toISOString(),
-        deviceId: deviceId(),
-        ownerUid: state.firebase.user.uid,
-        ownerEmail: state.firebase.user.email || ""
-      };
-      try {
-        await state.firebase.modules.setDoc(state.firebase.docRef, payload);
-        setSyncStatus(`雲端已更新：${formatDate(payload.updatedAt)}`);
-      } catch (error) {
-        setSyncStatus(firebaseErrorMessage(error));
-        throw error;
-      }
-    }
-
     async function initFirebase() {
       const modules = await loadFirebaseModules();
       state.firebase.app = modules.getApps().some((app) => app.name === "what-to-do-app")
@@ -1153,12 +1136,41 @@
       return modules;
     }
 
-    async function loadCloudSync() {
-      if (!state.firebase.user || !state.firebase.docRef || !state.firebase.modules) {
-        setSyncStatus("請先登入，登入後才能從雲端載入。");
-        return;
+    function setFirebaseUser(user) {
+      state.firebase.user = user || null;
+      state.firebase.enabled = Boolean(user);
+      state.firebase.docRef = user && state.firebase.modules
+        ? state.firebase.modules.doc(state.firebase.db, "whatToDo", user.uid)
+        : null;
+    }
+
+    async function ensureFirebaseLogin() {
+      const modules = await initFirebase();
+      const user = state.firebase.auth.currentUser || state.firebase.user;
+      if (!user) {
+        setFirebaseUser(null);
+        throw Object.assign(new Error("Firebase user is not signed in."), { code: "unauthenticated" });
       }
-      const modules = state.firebase.modules;
+      setFirebaseUser(user);
+      return modules;
+    }
+
+    async function pushFirebaseSync() {
+      if (state.firebase.applyingRemote) return;
+      const modules = await ensureFirebaseLogin();
+      const payload = {
+        ...currentPayload(),
+        updatedAt: new Date().toISOString(),
+        deviceId: deviceId(),
+        ownerUid: state.firebase.user.uid,
+        ownerEmail: state.firebase.user.email || ""
+      };
+      await modules.setDoc(state.firebase.docRef, payload);
+      setSyncStatus(`雲端已更新：${formatDate(payload.updatedAt)}`);
+    }
+
+    async function loadCloudSync() {
+      const modules = await ensureFirebaseLogin();
       const snapshot = await modules.getDoc(state.firebase.docRef);
       if (snapshot.exists()) {
         const remote = snapshot.data();
@@ -1178,12 +1190,11 @@
         return;
       }
 
+      await modules.setPersistence(state.firebase.auth, modules.browserLocalPersistence);
       const credential = await modules.signInWithEmailAndPassword(state.firebase.auth, email, password);
-      state.firebase.user = credential.user;
+      setFirebaseUser(credential.user);
       firebasePasswordInput.value = "";
       localStorage.setItem(FIREBASE_EMAIL_KEY, state.firebase.user.email || email);
-      state.firebase.docRef = modules.doc(state.firebase.db, "whatToDo", state.firebase.user.uid);
-      state.firebase.enabled = true;
       setSyncStatus(`已登入：${state.firebase.user.email || state.firebase.user.uid}。按「存檔上傳」才會寫入雲端。`);
     }
 
@@ -1639,8 +1650,8 @@
       try {
         await connectFirebase();
         showToast("Firebase 已登入");
-      } catch {
-        setSyncStatus("登入失敗，請檢查 Email、Password、Authentication 與網路");
+      } catch (error) {
+        setSyncStatus(firebaseErrorMessage(error));
         showToast("登入失敗");
       }
     });
@@ -1650,13 +1661,14 @@
     loadCloudButton.addEventListener("click", async () => {
       try {
         await loadCloudSync();
-      } catch {
+      } catch (error) {
+        setSyncStatus(firebaseErrorMessage(error));
         showToast("雲端載入失敗");
       }
     });
 
     syncNowButton.addEventListener("click", async () => {
-      if (!state.firebase.enabled || !state.firebase.user) {
+      if (!state.firebase.enabled && !state.firebase.auth?.currentUser) {
         document.querySelector("#syncTitle").scrollIntoView({ behavior: "smooth", block: "center" });
         showToast("請先登入 Firebase");
         return;
