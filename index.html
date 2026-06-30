@@ -816,8 +816,6 @@
         user: null,
         db: null,
         docRef: null,
-        unsubscribe: null,
-        authUnsubscribe: null,
         modules: null
       }
     };
@@ -971,7 +969,11 @@
       } catch {
         backupStatus.textContent = "自動備份失敗，請重新啟用";
       }
-      await pushFirebaseSync();
+      try {
+        await pushFirebaseSync();
+      } catch (error) {
+        setSyncStatus(firebaseErrorMessage(error));
+      }
       if (message) showToast(message);
     }
 
@@ -1087,6 +1089,20 @@
       syncStatus.textContent = message;
     }
 
+    function firebaseErrorMessage(error) {
+      const code = error?.code || "unknown";
+      if (code === "permission-denied") {
+        return "Firestore 規則擋住了，請確認 rules 是 whatToDo/{userId} 且 request.auth.uid == userId。";
+      }
+      if (code === "unauthenticated") {
+        return "登入狀態已失效，請重新登入。";
+      }
+      if (code === "unavailable") {
+        return "Firebase 暫時連不上，請稍後再試或檢查網路。";
+      }
+      return `Firebase 錯誤：${code}`;
+    }
+
     async function loadFirebaseModules() {
       if (state.firebase.modules) return state.firebase.modules;
 
@@ -1118,8 +1134,13 @@
         ownerUid: state.firebase.user.uid,
         ownerEmail: state.firebase.user.email || ""
       };
-      await state.firebase.modules.setDoc(state.firebase.docRef, payload);
-      setSyncStatus(`雲端已更新：${formatDate(payload.updatedAt)}`);
+      try {
+        await state.firebase.modules.setDoc(state.firebase.docRef, payload);
+        setSyncStatus(`雲端已更新：${formatDate(payload.updatedAt)}`);
+      } catch (error) {
+        setSyncStatus(firebaseErrorMessage(error));
+        throw error;
+      }
     }
 
     async function initFirebase() {
@@ -1163,25 +1184,12 @@
       localStorage.setItem(FIREBASE_EMAIL_KEY, state.firebase.user.email || email);
       state.firebase.docRef = modules.doc(state.firebase.db, "whatToDo", state.firebase.user.uid);
       state.firebase.enabled = true;
-      setSyncStatus(`已登入：${state.firebase.user.email || state.firebase.user.uid}。按「存檔上傳」後會寫入雲端，之後變更會自動同步。`);
-
-      state.firebase.unsubscribe = modules.onSnapshot(state.firebase.docRef, (docSnap) => {
-        if (!docSnap.exists()) return;
-        const remote = docSnap.data();
-        if (remote.deviceId === deviceId()) return;
-        if ((remote.updatedAt || "") <= localUpdatedAt()) return;
-        applyCloudPayload(remote);
-        setSyncStatus(`已接收雲端更新：${formatDate(remote.updatedAt)}`);
-      }, () => {
-        setSyncStatus("雲端同步中斷，請檢查登入狀態與 Firestore 規則");
-      });
+      setSyncStatus(`已登入：${state.firebase.user.email || state.firebase.user.uid}。按「存檔上傳」才會寫入雲端。`);
     }
 
     function disconnectFirebase() {
-      if (state.firebase.unsubscribe) state.firebase.unsubscribe();
       if (state.firebase.auth) state.firebase.modules?.signOut(state.firebase.auth).catch(() => {});
       state.firebase.enabled = false;
-      state.firebase.unsubscribe = null;
       state.firebase.docRef = null;
       state.firebase.user = null;
       setSyncStatus("已登出");
@@ -1657,7 +1665,8 @@
       try {
         await pushFirebaseSync();
         showToast("已同步到雲端");
-      } catch {
+      } catch (error) {
+        setSyncStatus(firebaseErrorMessage(error));
         showToast("同步失敗");
       }
     });
