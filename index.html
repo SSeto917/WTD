@@ -234,7 +234,8 @@
       align-items: center;
     }
 
-    .category-filter {
+    .category-filter,
+    .status-filter {
       width: min(210px, 100%);
       min-height: 38px;
       border-radius: 999px;
@@ -671,6 +672,11 @@
         <div class="section-head">
           <h2>搜尋結果</h2>
           <div class="result-tools">
+            <select class="status-filter" id="statusFilter" aria-label="紀錄狀態篩選">
+              <option value="open">待接續</option>
+              <option value="done">已完成封存</option>
+              <option value="all">全部紀錄</option>
+            </select>
             <select class="category-filter" id="categoryFilter" aria-label="分類篩選">
               <option value="all">全部分類</option>
             </select>
@@ -807,6 +813,7 @@
       savedTags: loadTags(),
       query: "",
       filter: "all",
+      statusScope: "open",
       category: "all",
       firebase: {
         enabled: false,
@@ -824,6 +831,7 @@
     const clearSearch = document.querySelector("#clearSearch");
     const results = document.querySelector("#results");
     const resultCount = document.querySelector("#resultCount");
+    const statusFilter = document.querySelector("#statusFilter");
     const categoryFilter = document.querySelector("#categoryFilter");
     const renameCategoryButton = document.querySelector("#renameCategory");
     const categorySuggestions = document.querySelector("#categorySuggestions");
@@ -1212,29 +1220,43 @@
       const scoped = state.filter === "today"
         ? sorted.filter((task) => isToday(task.updatedAt))
         : sorted;
-      const categorized = state.category === "all"
+      const statusScoped = state.statusScope === "done"
+        ? scoped.filter((task) => task.status === "done")
+        : state.statusScope === "all"
         ? scoped
-        : scoped.filter((task) => taskCategory(task) === state.category);
+        : scoped.filter((task) => task.status !== "done");
+      const categorized = state.category === "all"
+        ? statusScoped
+        : statusScoped.filter((task) => taskCategory(task) === state.category);
 
       if (!query) return categorized;
 
       return categorized.filter((task) => searchableText(task).includes(query));
     }
 
+    function resultScopeLabel() {
+      if (state.statusScope === "done") return "已完成封存";
+      if (state.statusScope === "all") return "全部紀錄";
+      return "待接續";
+    }
+
     function render() {
       renderCategories();
       renderTags();
+      statusFilter.value = state.statusScope;
       const tasks = filteredTasks();
       resultCount.textContent = state.filter === "today"
         ? `${tasks.length} 筆今天更新`
         : state.query
-        ? `${tasks.length} 筆符合「${state.query}」`
-        : `${tasks.length} 筆暫停紀錄`;
+        ? `${tasks.length} 筆${resultScopeLabel()}符合「${state.query}」`
+        : `${tasks.length} 筆${resultScopeLabel()}`;
 
       if (!tasks.length) {
         results.innerHTML = state.filter === "today"
           ? `<div class="empty">今天還沒有更新紀錄。新增或編輯一筆任務後，這裡就會出現。</div>`
-          : `<div class="empty">找不到符合的紀錄。換個關鍵字，或在右側新增一筆暫停點。</div>`;
+          : state.statusScope === "done"
+          ? `<div class="empty">已完成封存目前沒有符合的紀錄。</div>`
+          : `<div class="empty">找不到符合的待接續紀錄。已完成項目可切到「已完成封存」查看。</div>`;
         return;
       }
 
@@ -1431,9 +1453,15 @@
       button.addEventListener("click", () => {
         state.query = button.dataset.query;
         state.filter = "all";
+        state.statusScope = "open";
         searchInput.value = state.query;
         render();
       });
+    });
+
+    statusFilter.addEventListener("change", () => {
+      state.statusScope = statusFilter.value;
+      render();
     });
 
     categoryFilter.addEventListener("change", () => {
@@ -1468,6 +1496,7 @@
     document.querySelector("#todayFilter").addEventListener("click", () => {
       state.query = "";
       state.filter = "today";
+      state.statusScope = "open";
       searchInput.value = "";
       render();
       window.scrollTo({ top: document.querySelector(".board").offsetTop - 18, behavior: "smooth" });
@@ -1476,6 +1505,7 @@
     document.querySelector("#showAll").addEventListener("click", () => {
       state.query = "";
       state.filter = "all";
+      state.statusScope = "open";
       state.category = "all";
       searchInput.value = "";
       render();
