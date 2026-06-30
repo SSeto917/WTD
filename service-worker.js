@@ -1,4 +1,4 @@
-const CACHE_NAME = "what-to-do-pwa-v1";
+const CACHE_NAME = "what-to-do-pwa-v2-20260630";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -25,15 +25,35 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
+  const requestUrl = new URL(event.request.url);
+  const isAppPage = event.request.mode === "navigate"
+    || requestUrl.pathname.endsWith("/")
+    || requestUrl.pathname.endsWith("/index.html");
+
+  if (isAppPage) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put("./index.html", copy);
+            cache.put("./", response.clone());
+          });
+          return response;
+        })
+        .catch(() => caches.match("./index.html"))
+    );
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).then((response) => {
+    fetch(event.request)
+      .then((response) => {
         if (!response || response.status !== 200 || response.type === "opaque") return response;
         const copy = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
         return response;
-      });
-    })
+      })
+      .catch(() => caches.match(event.request))
   );
 });
