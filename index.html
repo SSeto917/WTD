@@ -1,0 +1,1704 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What to do</title>
+  <meta name="theme-color" content="#2563eb">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #202124;
+      --muted: #6f7680;
+      --line: #dfe4ea;
+      --panel: #ffffff;
+      --soft: #f4f7fb;
+      --blue: #2563eb;
+      --green: #15803d;
+      --amber: #b45309;
+      --red: #b91c1c;
+      --shadow: 0 18px 50px rgba(21, 31, 46, .12);
+      font-family: "Segoe UI", "Noto Sans TC", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(120deg, rgba(37, 99, 235, .08), transparent 34%),
+        linear-gradient(240deg, rgba(21, 128, 61, .07), transparent 36%),
+        #fbfcfe;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 48px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb, #0f766e);
+      box-shadow: 0 10px 22px rgba(37, 99, 235, .22);
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .backup-note {
+      flex-basis: 100%;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .icon-button,
+    .text-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      border-radius: 999px;
+      color: #243042;
+      background: rgba(255, 255, 255, .72);
+      border: 1px solid rgba(223, 228, 234, .86);
+      box-shadow: 0 8px 20px rgba(21, 31, 46, .06);
+    }
+
+    .icon-button {
+      width: 38px;
+      font-size: 18px;
+    }
+
+    .text-button {
+      gap: 8px;
+      padding: 0 14px;
+      font-weight: 650;
+    }
+
+    .hero {
+      display: grid;
+      align-content: center;
+      gap: 28px;
+      min-height: 48vh;
+      padding: 56px 0 24px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(42px, 8vw, 84px);
+      line-height: .95;
+      font-weight: 800;
+      color: #1f2937;
+      letter-spacing: 0;
+    }
+
+    .tagline {
+      max-width: 620px;
+      margin: 14px auto 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .search-wrap {
+      position: relative;
+      width: min(760px, 100%);
+      margin: 0 auto;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 22px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 22px;
+      color: #6b7280;
+      pointer-events: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      min-height: 64px;
+      padding: 0 64px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      outline: 0;
+      background: rgba(255, 255, 255, .96);
+      box-shadow: var(--shadow);
+      font-size: 18px;
+      transition: border-color .18s, box-shadow .18s, transform .18s;
+    }
+
+    #searchInput:focus {
+      border-color: rgba(37, 99, 235, .7);
+      box-shadow: 0 22px 60px rgba(37, 99, 235, .16);
+      transform: translateY(-1px);
+    }
+
+    .clear-search {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      background: transparent;
+      color: #667085;
+      font-size: 20px;
+    }
+
+    .quick-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      min-height: 34px;
+    }
+
+    .chip {
+      padding: 8px 13px;
+      border-radius: 999px;
+      color: #314155;
+      background: rgba(255, 255, 255, .76);
+      border: 1px solid rgba(223, 228, 234, .84);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(300px, .9fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .result-tools {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .category-filter {
+      width: min(210px, 100%);
+      min-height: 38px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .88);
+      font-size: 14px;
+    }
+
+    .rename-category {
+      min-height: 38px;
+      padding: 0 12px;
+      border-radius: 999px;
+      color: #344054;
+      background: #eef2f7;
+      border: 1px solid #dfe7f0;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 21px;
+      letter-spacing: 0;
+    }
+
+    .count {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .results {
+      display: grid;
+      gap: 12px;
+    }
+
+    .task {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+      border: 1px solid rgba(223, 228, 234, .9);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .92);
+      box-shadow: 0 10px 28px rgba(21, 31, 46, .07);
+    }
+
+    .task-main {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .task h3 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    .task p {
+      margin: 6px 0 0;
+      color: #586271;
+      line-height: 1.65;
+    }
+
+    .status {
+      flex: 0 0 auto;
+      height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status-paused {
+      color: var(--amber);
+      background: #fff7ed;
+    }
+
+    .status-active {
+      color: var(--blue);
+      background: #eff6ff;
+    }
+
+    .status-blocked {
+      color: var(--red);
+      background: #fef2f2;
+    }
+
+    .status-done {
+      color: var(--green);
+      background: #f0fdf4;
+    }
+
+    .progress-line {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .bar-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e8edf3;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: var(--progress);
+      border-radius: inherit;
+      background: linear-gradient(90deg, #2563eb, #0f766e);
+    }
+
+    .progress-value,
+    .meta {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+    }
+
+    .task-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .small-action {
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      color: #344054;
+      background: var(--soft);
+      border: 1px solid #e5eaf0;
+      font-weight: 650;
+    }
+
+    aside {
+      position: sticky;
+      top: 18px;
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+      border: 1px solid rgba(223, 228, 234, .9);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .88);
+      box-shadow: 0 12px 34px rgba(21, 31, 46, .08);
+    }
+
+    form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .sync-panel {
+      display: grid;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid #dfe7f0;
+    }
+
+    .sync-panel h2 {
+      font-size: 18px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: #3b4656;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .tag-field {
+      position: relative;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      outline: 0;
+    }
+
+    input,
+    select {
+      min-height: 42px;
+      padding: 0 12px;
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+      padding: 10px 12px;
+      line-height: 1.55;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .progress-helper {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid #dfe7f0;
+      border-radius: 8px;
+      background: #f8fafc;
+    }
+
+    .progress-presets {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .preset-button {
+      min-height: 38px;
+      padding: 0 8px;
+      border-radius: 999px;
+      color: #283548;
+      background: #fff;
+      border: 1px solid #dfe7f0;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .preset-button.active {
+      color: #fff;
+      background: #2563eb;
+      border-color: #2563eb;
+    }
+
+    .progress-hint {
+      min-height: 42px;
+      margin: 0;
+      color: #526071;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .tag-suggestions {
+      position: absolute;
+      z-index: 20;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      display: none;
+      max-height: 180px;
+      overflow: auto;
+      padding: 6px;
+      border: 1px solid #dfe7f0;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 14px 34px rgba(21, 31, 46, .13);
+    }
+
+    .tag-suggestions.show {
+      display: grid;
+      gap: 4px;
+    }
+
+    .tag-suggestion {
+      min-height: 34px;
+      padding: 0 10px;
+      border-radius: 7px;
+      color: #283548;
+      background: transparent;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .tag-suggestion:hover,
+    .tag-suggestion:focus {
+      background: #eef4ff;
+    }
+
+    .primary {
+      min-height: 44px;
+      border-radius: 999px;
+      background: #1f2937;
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .secondary {
+      min-height: 42px;
+      border-radius: 999px;
+      background: #eef2f7;
+      color: #283548;
+      font-weight: 750;
+    }
+
+    .empty {
+      padding: 28px;
+      border: 1px dashed #cfd7e2;
+      border-radius: 8px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, .74);
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      padding: 12px 16px;
+      border-radius: 999px;
+      color: #fff;
+      background: #1f2937;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, .18);
+      transition: opacity .2s, transform .2s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 840px) {
+      .shell {
+        width: min(100% - 22px, 720px);
+        padding-top: 18px;
+      }
+
+      header {
+        align-items: flex-start;
+      }
+
+      .hero {
+        min-height: 42vh;
+        padding-top: 42px;
+      }
+
+      .tagline {
+        font-size: 16px;
+      }
+
+      #searchInput {
+        min-height: 58px;
+        font-size: 16px;
+        padding: 0 56px;
+      }
+
+      .board {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        position: static;
+      }
+    }
+
+    @media (max-width: 560px) {
+      header,
+      .task-main,
+      .section-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .top-actions {
+        justify-content: flex-start;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .progress-line {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">W</div>
+        <span>What to do</span>
+      </div>
+      <div class="top-actions">
+        <button class="text-button" id="showAll" type="button">全部進度</button>
+        <button class="text-button" id="installApp" type="button" hidden>安裝</button>
+        <button class="text-button" id="autoBackup" type="button">自動備份</button>
+        <button class="text-button" id="syncNow" type="button">存檔上傳</button>
+        <button class="icon-button" id="exportData" type="button" title="匯出資料" aria-label="匯出資料">⇩</button>
+        <button class="icon-button" id="importData" type="button" title="匯入資料" aria-label="匯入資料">⇧</button>
+        <span class="backup-note" id="backupStatus">尚未啟用自動備份</span>
+      </div>
+    </header>
+
+    <section class="hero" aria-labelledby="pageTitle">
+      <div>
+        <h1 id="pageTitle">What to do</h1>
+        <p class="tagline">搜尋上一階段停在哪裡、還差什麼、下一步該接哪一段。</p>
+      </div>
+
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input id="searchInput" type="search" autocomplete="off" placeholder="搜尋任務、暫停點、下一步、關鍵字...">
+        <button class="clear-search" id="clearSearch" type="button" title="清除搜尋" aria-label="清除搜尋">×</button>
+      </div>
+
+      <div class="quick-row" aria-label="快速搜尋">
+        <button class="chip" type="button" data-query="暫停">暫停</button>
+        <button class="chip" type="button" data-query="卡住">卡住</button>
+        <button class="chip" type="button" data-query="下一步">下一步</button>
+        <button class="chip" type="button" id="todayFilter">今天更新</button>
+      </div>
+    </section>
+
+    <section class="board">
+      <div>
+        <div class="section-head">
+          <h2>搜尋結果</h2>
+          <div class="result-tools">
+            <select class="category-filter" id="categoryFilter" aria-label="分類篩選">
+              <option value="all">全部分類</option>
+            </select>
+            <button class="rename-category" id="renameCategory" type="button">改名分類</button>
+            <span class="count" id="resultCount"></span>
+          </div>
+        </div>
+        <div class="results" id="results"></div>
+      </div>
+
+      <aside aria-labelledby="formTitle">
+        <h2 id="formTitle">新增暫停紀錄</h2>
+        <form id="taskForm">
+          <input type="hidden" id="taskId">
+          <label>
+            任務名稱
+            <input id="titleInput" required placeholder="例：BOSS 頁面 PWA 修正">
+          </label>
+          <label>
+            暫停點 / 目前進度
+            <textarea id="noteInput" required placeholder="例：已完成離線快取，停在 icon 顯示檢查。"></textarea>
+          </label>
+          <label>
+            下一步
+            <input id="nextInput" placeholder="例：開啟手機版測試首頁 icon">
+          </label>
+          <label>
+            分類
+            <input id="categoryInput" list="categorySuggestions" placeholder="例：網頁、影片、考試、生活">
+            <datalist id="categorySuggestions"></datalist>
+          </label>
+          <div class="form-grid">
+            <label>
+              狀態
+              <select id="statusInput">
+                <option value="paused">暫停中</option>
+                <option value="active">進行中</option>
+                <option value="blocked">卡住</option>
+                <option value="done">已完成</option>
+              </select>
+            </label>
+            <label>
+              接續進度 %
+              <input id="progressInput" type="number" min="0" max="100" step="5" value="30">
+            </label>
+          </div>
+          <div class="progress-helper" aria-label="接續進度判斷">
+            <div class="progress-presets">
+              <button class="preset-button" type="button" data-progress="25">25%</button>
+              <button class="preset-button" type="button" data-progress="50">50%</button>
+              <button class="preset-button" type="button" data-progress="75">75%</button>
+              <button class="preset-button" type="button" data-progress="90">90%</button>
+            </div>
+            <p class="progress-hint" id="progressHint"></p>
+          </div>
+          <label class="tag-field">
+            關鍵字
+            <input id="tagsInput" autocomplete="off" placeholder="例：網頁, PWA, 上傳">
+            <div class="tag-suggestions" id="tagSuggestions" role="listbox" aria-label="關鍵字建議"></div>
+          </label>
+          <button class="primary" type="submit">儲存紀錄</button>
+          <button class="secondary" id="resetForm" type="button">清空表單</button>
+        </form>
+        <section class="sync-panel" aria-labelledby="syncTitle">
+          <h2 id="syncTitle">Firebase 同步</h2>
+          <p class="progress-hint">登入後按「存檔上傳」會同步到 Firestore 的 <strong>whatToDo/{uid}</strong>。Firebase 已內建設定。</p>
+          <div class="form-grid">
+            <label>
+              Email
+              <input id="firebaseEmailInput" type="email" autocomplete="username">
+            </label>
+            <label>
+              Password
+              <input id="firebasePasswordInput" type="password" autocomplete="current-password">
+            </label>
+          </div>
+          <button class="primary" id="connectFirebase" type="button">登入</button>
+          <button class="secondary" id="disconnectFirebase" type="button">登出</button>
+          <button class="secondary" id="loadCloud" type="button">從雲端載入</button>
+          <p class="progress-hint" id="syncStatus">尚未連線 Firebase</p>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <input id="filePicker" type="file" accept="application/json" hidden>
+
+  <script>
+    const STORAGE_KEY = "what-to-do.paused-tasks.v1";
+    const CATEGORY_KEY = "what-to-do.categories.v1";
+    const TAG_KEY = "what-to-do.tags.v1";
+    const BACKUP_META_KEY = "what-to-do.auto-backup-meta.v1";
+    const LOCAL_META_KEY = "what-to-do.local-meta.v1";
+    const FIREBASE_EMAIL_KEY = "what-to-do.firebase-email.v1";
+    const DEVICE_ID_KEY = "what-to-do.device-id.v1";
+    const firebaseConfig = {
+      apiKey: "AIzaSyDx-VmGCabZsSkWwipuwGgz-jECl7JyWQE",
+      authDomain: "boss-9fb7e.firebaseapp.com",
+      projectId: "boss-9fb7e",
+      storageBucket: "boss-9fb7e.firebasestorage.app",
+      messagingSenderId: "369809083802",
+      appId: "1:369809083802:web:2cca656e4ba52dc1427e23"
+    };
+
+    const starterTasks = [
+      {
+        id: crypto.randomUUID(),
+        title: "建立 What to do 搜尋頁",
+        note: "頁面已具備 Google 風格搜尋列，可搜尋上一階段暫停的任務進度。",
+        next: "開始新增自己的真實任務，之後可直接用關鍵字找回停在哪。",
+        status: "active",
+        progress: 70,
+        category: "網頁",
+        tags: ["網頁", "任務", "搜尋"],
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: crypto.randomUUID(),
+        title: "任務進度資料庫",
+        note: "目前先使用瀏覽器本機儲存，不需要安裝伺服器。",
+        next: "若要跨電腦同步，可匯出 JSON 或再接雲端資料庫。",
+        status: "paused",
+        progress: 45,
+        category: "資料",
+        tags: ["localStorage", "資料", "同步"],
+        updatedAt: new Date().toISOString()
+      }
+    ];
+
+    const state = {
+      tasks: loadTasks(),
+      savedCategories: loadCategories(),
+      savedTags: loadTags(),
+      query: "",
+      filter: "all",
+      category: "all",
+      firebase: {
+        enabled: false,
+        applyingRemote: false,
+        app: null,
+        auth: null,
+        user: null,
+        db: null,
+        docRef: null,
+        unsubscribe: null,
+        authUnsubscribe: null,
+        modules: null
+      }
+    };
+
+    const searchInput = document.querySelector("#searchInput");
+    const clearSearch = document.querySelector("#clearSearch");
+    const results = document.querySelector("#results");
+    const resultCount = document.querySelector("#resultCount");
+    const categoryFilter = document.querySelector("#categoryFilter");
+    const renameCategoryButton = document.querySelector("#renameCategory");
+    const categorySuggestions = document.querySelector("#categorySuggestions");
+    const tagSuggestions = document.querySelector("#tagSuggestions");
+    const form = document.querySelector("#taskForm");
+    const toast = document.querySelector("#toast");
+    const filePicker = document.querySelector("#filePicker");
+    const autoBackupButton = document.querySelector("#autoBackup");
+    const backupStatus = document.querySelector("#backupStatus");
+    const installAppButton = document.querySelector("#installApp");
+    const syncNowButton = document.querySelector("#syncNow");
+    const firebaseEmailInput = document.querySelector("#firebaseEmailInput");
+    const firebasePasswordInput = document.querySelector("#firebasePasswordInput");
+    const connectFirebaseButton = document.querySelector("#connectFirebase");
+    const disconnectFirebaseButton = document.querySelector("#disconnectFirebase");
+    const loadCloudButton = document.querySelector("#loadCloud");
+    const syncStatus = document.querySelector("#syncStatus");
+    const progressInput = document.querySelector("#progressInput");
+    const progressHint = document.querySelector("#progressHint");
+    const tagsInput = document.querySelector("#tagsInput");
+    let backupHandle = null;
+    let backupDownloadFallback = false;
+    let deferredInstallPrompt = null;
+
+    const progressGuide = [
+      { max: 10, text: "只有想法或剛開任務，回來還要重新整理方向。" },
+      { max: 30, text: "方向大致確定，但明天回來還需要花時間想一下。" },
+      { max: 60, text: "已經知道下一步，看紀錄可以接著做。" },
+      { max: 80, text: "主體已成形，剩補細節、修錯或整理。" },
+      { max: 95, text: "幾乎完成，只剩檢查、測試、上傳或收尾。" },
+      { max: 100, text: "已完成，可以不用再接。" }
+    ];
+
+    function loadTasks() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return starterTasks;
+
+      try {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed : starterTasks;
+      } catch {
+        return starterTasks;
+      }
+    }
+
+    function loadCategories() {
+      const saved = localStorage.getItem(CATEGORY_KEY);
+      const defaults = starterTasks.map((task) => task.category).filter(Boolean);
+      if (!saved) return defaults;
+
+      try {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed.map(String).filter(Boolean) : defaults;
+      } catch {
+        return defaults;
+      }
+    }
+
+    function loadTags() {
+      const saved = localStorage.getItem(TAG_KEY);
+      const defaults = starterTasks.flatMap((task) => task.tags || []);
+      if (!saved) return defaults;
+
+      try {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed.map(String).filter(Boolean) : defaults;
+      } catch {
+        return defaults;
+      }
+    }
+
+    function localUpdatedAt() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(LOCAL_META_KEY) || "{}");
+        return parsed.updatedAt || new Date(0).toISOString();
+      } catch {
+        return new Date(0).toISOString();
+      }
+    }
+
+    function saveTasks(touch = true) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks));
+      localStorage.setItem(CATEGORY_KEY, JSON.stringify(categories()));
+      localStorage.setItem(TAG_KEY, JSON.stringify(tags()));
+      if (touch) {
+        localStorage.setItem(LOCAL_META_KEY, JSON.stringify({ updatedAt: new Date().toISOString() }));
+      }
+    }
+
+    function currentPayload() {
+      return {
+        exportedAt: new Date().toISOString(),
+        app: "What to do",
+        version: 1,
+        categories: categories(),
+        tags: tags(),
+        tasks: state.tasks
+      };
+    }
+
+    function backupPayload() {
+      return JSON.stringify(currentPayload(), null, 2);
+    }
+
+    function backupFileName() {
+      return `what-to-do-auto-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    }
+
+    function downloadBackup() {
+      const blob = new Blob([backupPayload()], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = backupFileName();
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function writeAutoBackup() {
+      if (backupHandle) {
+        const writable = await backupHandle.createWritable();
+        await writable.write(backupPayload());
+        await writable.close();
+        localStorage.setItem(BACKUP_META_KEY, JSON.stringify({
+          enabled: true,
+          mode: "file",
+          updatedAt: new Date().toISOString()
+        }));
+        backupStatus.textContent = `自動備份已更新：${formatDate(new Date().toISOString())}`;
+        return;
+      }
+
+      if (backupDownloadFallback) {
+        downloadBackup();
+        backupStatus.textContent = `已下載備份：${formatDate(new Date().toISOString())}`;
+      }
+    }
+
+    async function persistTasks(message) {
+      saveTasks();
+      try {
+        await writeAutoBackup();
+      } catch {
+        backupStatus.textContent = "自動備份失敗，請重新啟用";
+      }
+      await pushFirebaseSync();
+      if (message) showToast(message);
+    }
+
+    function normalize(text) {
+      return String(text || "").trim().toLowerCase();
+    }
+
+    function statusLabel(status) {
+      return {
+        paused: "暫停中",
+        active: "進行中",
+        blocked: "卡住",
+        done: "已完成"
+      }[status] || "暫停中";
+    }
+
+    function formatDate(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "尚未更新";
+      return new Intl.DateTimeFormat("zh-TW", {
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(date);
+    }
+
+    function isToday(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return false;
+      const now = new Date();
+      return date.getFullYear() === now.getFullYear()
+        && date.getMonth() === now.getMonth()
+        && date.getDate() === now.getDate();
+    }
+
+    function searchableText(task) {
+      return normalize([
+        task.title,
+        task.note,
+        task.next,
+        task.category,
+        task.status,
+        statusLabel(task.status),
+        ...(task.tags || [])
+      ].join(" "));
+    }
+
+    function taskCategory(task) {
+      return String(task.category || "").trim() || "未分類";
+    }
+
+    function categories() {
+      return [...new Set([
+        ...state.savedCategories,
+        ...state.tasks.map(taskCategory)
+      ].map((category) => String(category || "").trim()).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, "zh-Hant"));
+    }
+
+    function tags() {
+      return [...new Set([
+        ...state.savedTags,
+        ...state.tasks.flatMap((task) => Array.isArray(task.tags) ? task.tags : [])
+      ].map((tag) => String(tag || "").trim()).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, "zh-Hant"));
+    }
+
+    function rememberCategory(category) {
+      const value = String(category || "").trim();
+      if (!value) return;
+      state.savedCategories = [...new Set([...state.savedCategories, value])];
+      localStorage.setItem(CATEGORY_KEY, JSON.stringify(categories()));
+    }
+
+    function renameCategory(oldName, newName) {
+      const from = String(oldName || "").trim();
+      const to = String(newName || "").trim();
+      if (!from || from === "all" || from === "未分類" || !to || from === to) return false;
+
+      state.tasks = state.tasks.map((task) => ({
+        ...task,
+        category: taskCategory(task) === from ? to : task.category
+      }));
+      state.savedCategories = [...new Set([
+        ...state.savedCategories.map((category) => String(category || "").trim() === from ? to : category),
+        to
+      ])].filter(Boolean);
+      state.category = to;
+      localStorage.setItem(CATEGORY_KEY, JSON.stringify(categories()));
+      return true;
+    }
+
+    function rememberTags(values) {
+      const nextTags = values
+        .map((tag) => String(tag || "").trim())
+        .filter(Boolean);
+      if (!nextTags.length) return;
+      state.savedTags = [...new Set([...state.savedTags, ...nextTags])];
+      localStorage.setItem(TAG_KEY, JSON.stringify(tags()));
+    }
+
+    function deviceId() {
+      let id = localStorage.getItem(DEVICE_ID_KEY);
+      if (!id) {
+        id = crypto.randomUUID();
+        localStorage.setItem(DEVICE_ID_KEY, id);
+      }
+      return id;
+    }
+
+    function setSyncStatus(message) {
+      syncStatus.textContent = message;
+    }
+
+    async function loadFirebaseModules() {
+      if (state.firebase.modules) return state.firebase.modules;
+
+      const appModule = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js");
+      const authModule = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js");
+      const firestoreModule = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js");
+      state.firebase.modules = { ...appModule, ...authModule, ...firestoreModule };
+      return state.firebase.modules;
+    }
+
+    function applyCloudPayload(payload) {
+      state.firebase.applyingRemote = true;
+      state.tasks = Array.isArray(payload.tasks) ? payload.tasks : [];
+      state.savedCategories = Array.isArray(payload.categories) ? payload.categories.map(String) : [];
+      state.savedTags = Array.isArray(payload.tags) ? payload.tags.map(String) : [];
+      saveTasks(false);
+      localStorage.setItem(LOCAL_META_KEY, JSON.stringify({ updatedAt: payload.updatedAt || new Date().toISOString() }));
+      state.firebase.applyingRemote = false;
+      render();
+    }
+
+    async function pushFirebaseSync() {
+      if (!state.firebase.enabled || state.firebase.applyingRemote || !state.firebase.user || !state.firebase.docRef || !state.firebase.modules) return;
+
+      const payload = {
+        ...currentPayload(),
+        updatedAt: new Date().toISOString(),
+        deviceId: deviceId(),
+        ownerUid: state.firebase.user.uid,
+        ownerEmail: state.firebase.user.email || ""
+      };
+      await state.firebase.modules.setDoc(state.firebase.docRef, payload);
+      setSyncStatus(`雲端已更新：${formatDate(payload.updatedAt)}`);
+    }
+
+    async function initFirebase() {
+      const modules = await loadFirebaseModules();
+      state.firebase.app = modules.getApps().some((app) => app.name === "what-to-do-app")
+        ? modules.getApp("what-to-do-app")
+        : modules.initializeApp(firebaseConfig, "what-to-do-app");
+      state.firebase.auth = modules.getAuth(state.firebase.app);
+      state.firebase.db = modules.getFirestore(state.firebase.app);
+      return modules;
+    }
+
+    async function loadCloudSync() {
+      if (!state.firebase.user || !state.firebase.docRef || !state.firebase.modules) {
+        setSyncStatus("請先登入，登入後才能從雲端載入。");
+        return;
+      }
+      const modules = state.firebase.modules;
+      const snapshot = await modules.getDoc(state.firebase.docRef);
+      if (snapshot.exists()) {
+        const remote = snapshot.data();
+        applyCloudPayload(remote);
+        setSyncStatus(`已套用雲端資料：${formatDate(remote.updatedAt)}`);
+      } else {
+        setSyncStatus("雲端目前沒有資料。");
+      }
+    }
+
+    async function connectFirebase() {
+      const modules = await initFirebase();
+      const email = firebaseEmailInput.value.trim();
+      const password = firebasePasswordInput.value;
+      if (!email || !password) {
+        setSyncStatus("請輸入 Email 和 Password。");
+        return;
+      }
+
+      const credential = await modules.signInWithEmailAndPassword(state.firebase.auth, email, password);
+      state.firebase.user = credential.user;
+      firebasePasswordInput.value = "";
+      localStorage.setItem(FIREBASE_EMAIL_KEY, state.firebase.user.email || email);
+      state.firebase.docRef = modules.doc(state.firebase.db, "whatToDo", state.firebase.user.uid);
+      state.firebase.enabled = true;
+      setSyncStatus(`已登入：${state.firebase.user.email || state.firebase.user.uid}。按「存檔上傳」後會寫入雲端，之後變更會自動同步。`);
+
+      state.firebase.unsubscribe = modules.onSnapshot(state.firebase.docRef, (docSnap) => {
+        if (!docSnap.exists()) return;
+        const remote = docSnap.data();
+        if (remote.deviceId === deviceId()) return;
+        if ((remote.updatedAt || "") <= localUpdatedAt()) return;
+        applyCloudPayload(remote);
+        setSyncStatus(`已接收雲端更新：${formatDate(remote.updatedAt)}`);
+      }, () => {
+        setSyncStatus("雲端同步中斷，請檢查登入狀態與 Firestore 規則");
+      });
+    }
+
+    function disconnectFirebase() {
+      if (state.firebase.unsubscribe) state.firebase.unsubscribe();
+      if (state.firebase.auth) state.firebase.modules?.signOut(state.firebase.auth).catch(() => {});
+      state.firebase.enabled = false;
+      state.firebase.unsubscribe = null;
+      state.firebase.docRef = null;
+      state.firebase.user = null;
+      setSyncStatus("已登出");
+    }
+
+    function filteredTasks() {
+      const query = normalize(state.query);
+      const sorted = [...state.tasks].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      const scoped = state.filter === "today"
+        ? sorted.filter((task) => isToday(task.updatedAt))
+        : sorted;
+      const categorized = state.category === "all"
+        ? scoped
+        : scoped.filter((task) => taskCategory(task) === state.category);
+
+      if (!query) return categorized;
+
+      return categorized.filter((task) => searchableText(task).includes(query));
+    }
+
+    function render() {
+      renderCategories();
+      renderTags();
+      const tasks = filteredTasks();
+      resultCount.textContent = state.filter === "today"
+        ? `${tasks.length} 筆今天更新`
+        : state.query
+        ? `${tasks.length} 筆符合「${state.query}」`
+        : `${tasks.length} 筆暫停紀錄`;
+
+      if (!tasks.length) {
+        results.innerHTML = state.filter === "today"
+          ? `<div class="empty">今天還沒有更新紀錄。新增或編輯一筆任務後，這裡就會出現。</div>`
+          : `<div class="empty">找不到符合的紀錄。換個關鍵字，或在右側新增一筆暫停點。</div>`;
+        return;
+      }
+
+      results.innerHTML = tasks.map((task) => `
+        <article class="task" data-id="${task.id}">
+          <div class="task-main">
+            <div>
+              <h3>${escapeHtml(task.title)}</h3>
+              <p>${escapeHtml(task.note)}</p>
+            </div>
+            <span class="status status-${task.status}">${statusLabel(task.status)}</span>
+          </div>
+          <div class="progress-line">
+            <div class="bar-track" aria-label="進度 ${task.progress}%">
+              <div class="bar-fill" style="--progress: ${clampProgress(task.progress)}%"></div>
+            </div>
+            <strong class="progress-value">${clampProgress(task.progress)}%</strong>
+          </div>
+          <div class="meta">
+            <span>分類：${escapeHtml(taskCategory(task))}</span>
+            <span>下一步：${escapeHtml(task.next || "尚未填寫")}</span>
+            <span>更新：${formatDate(task.updatedAt)}</span>
+            <span>${escapeHtml((task.tags || []).join(" / ") || "無標籤")}</span>
+          </div>
+          <div class="task-actions">
+            <button class="small-action" type="button" data-action="edit">編輯</button>
+            <button class="small-action" type="button" data-action="advance">進度 +10%</button>
+            <button class="small-action" type="button" data-action="done">完成</button>
+            <button class="small-action" type="button" data-action="delete">刪除</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderCategories() {
+      const selected = state.category || "all";
+      const options = categories();
+      categoryFilter.innerHTML = [
+        `<option value="all">全部分類</option>`,
+        ...options.map((category) => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`)
+      ].join("");
+      categoryFilter.value = options.includes(selected) ? selected : "all";
+      state.category = categoryFilter.value;
+
+      categorySuggestions.innerHTML = options
+        .filter((category) => category !== "未分類")
+        .map((category) => `<option value="${escapeHtml(category)}"></option>`)
+        .join("");
+    }
+
+    function currentTagFragment() {
+      const beforeCursor = tagsInput.value.slice(0, tagsInput.selectionStart || tagsInput.value.length);
+      return beforeCursor.split(",").pop().trim();
+    }
+
+    function replaceCurrentTag(tag) {
+      const cursor = tagsInput.selectionStart || tagsInput.value.length;
+      const beforeCursor = tagsInput.value.slice(0, cursor);
+      const afterCursor = tagsInput.value.slice(cursor);
+      const lastComma = beforeCursor.lastIndexOf(",");
+      const prefix = lastComma >= 0 ? `${beforeCursor.slice(0, lastComma + 1)} ` : "";
+      const suffix = afterCursor.startsWith(",") || !afterCursor.trim() ? afterCursor : `,${afterCursor}`;
+      tagsInput.value = `${prefix}${tag}${suffix}`;
+      tagsInput.focus();
+      tagsInput.setSelectionRange(`${prefix}${tag}`.length, `${prefix}${tag}`.length);
+      hideTagSuggestions();
+    }
+
+    function hideTagSuggestions() {
+      tagSuggestions.classList.remove("show");
+      tagSuggestions.innerHTML = "";
+    }
+
+    function renderTags() {
+      const fragment = normalize(currentTagFragment());
+      if (!fragment) {
+        hideTagSuggestions();
+        return;
+      }
+
+      const usedTags = document.querySelector("#tagsInput").value
+        .split(",")
+        .map((tag) => normalize(tag))
+        .filter(Boolean);
+      const matches = tags()
+        .filter((tag) => normalize(tag).includes(fragment) && !usedTags.includes(normalize(tag)))
+        .slice(0, 6);
+
+      if (!matches.length) {
+        hideTagSuggestions();
+        return;
+      }
+
+      tagSuggestions.innerHTML = matches
+        .map((tag) => `<button class="tag-suggestion" type="button" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`)
+        .join("");
+      tagSuggestions.classList.add("show");
+    }
+
+    function clampProgress(value) {
+      const number = Number(value);
+      if (Number.isNaN(number)) return 0;
+      return Math.max(0, Math.min(100, number));
+    }
+
+    function progressText(value) {
+      const progress = clampProgress(value);
+      const item = progressGuide.find((guide) => progress <= guide.max);
+      return `${progress}%：${item ? item.text : "看紀錄可以很快接回來。"}`;
+    }
+
+    function updateProgressHint() {
+      progressHint.textContent = progressText(progressInput.value);
+      document.querySelectorAll("[data-progress]").forEach((button) => {
+        button.classList.toggle("active", Number(button.dataset.progress) === clampProgress(progressInput.value));
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function taskFromForm() {
+      const category = document.querySelector("#categoryInput").value.trim();
+      const taskTags = document.querySelector("#tagsInput").value
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean);
+      rememberCategory(category);
+      rememberTags(taskTags);
+
+      return {
+        id: document.querySelector("#taskId").value || crypto.randomUUID(),
+        title: document.querySelector("#titleInput").value.trim(),
+        note: document.querySelector("#noteInput").value.trim(),
+        next: document.querySelector("#nextInput").value.trim(),
+        category,
+        status: document.querySelector("#statusInput").value,
+        progress: clampProgress(document.querySelector("#progressInput").value),
+        tags: taskTags,
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function fillForm(task) {
+      document.querySelector("#taskId").value = task.id;
+      document.querySelector("#titleInput").value = task.title;
+      document.querySelector("#noteInput").value = task.note;
+      document.querySelector("#nextInput").value = task.next || "";
+      document.querySelector("#categoryInput").value = task.category || "";
+      document.querySelector("#statusInput").value = task.status || "paused";
+      progressInput.value = clampProgress(task.progress);
+      updateProgressHint();
+      document.querySelector("#tagsInput").value = (task.tags || []).join(", ");
+      document.querySelector("#formTitle").textContent = "編輯暫停紀錄";
+      document.querySelector("#titleInput").focus();
+    }
+
+    function resetForm() {
+      form.reset();
+      document.querySelector("#taskId").value = "";
+      progressInput.value = 30;
+      updateProgressHint();
+      document.querySelector("#formTitle").textContent = "新增暫停紀錄";
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 1900);
+    }
+
+    searchInput.addEventListener("input", (event) => {
+      state.query = event.target.value;
+      state.filter = "all";
+      render();
+    });
+
+    clearSearch.addEventListener("click", () => {
+      searchInput.value = "";
+      state.query = "";
+      state.filter = "all";
+      render();
+      searchInput.focus();
+    });
+
+    document.querySelectorAll("[data-query]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.query = button.dataset.query;
+        state.filter = "all";
+        searchInput.value = state.query;
+        render();
+      });
+    });
+
+    categoryFilter.addEventListener("change", () => {
+      state.category = categoryFilter.value;
+      render();
+    });
+
+    renameCategoryButton.addEventListener("click", async () => {
+      const current = categoryFilter.value;
+      if (current === "all") {
+        showToast("請先選一個分類");
+        return;
+      }
+
+      if (current === "未分類") {
+        showToast("未分類不能改名，請先編輯紀錄分類");
+        return;
+      }
+
+      const nextName = window.prompt("輸入新的分類名稱", current);
+      if (nextName === null) return;
+
+      if (!renameCategory(current, nextName)) {
+        showToast("分類名稱沒有變更");
+        return;
+      }
+
+      await persistTasks("分類已改名");
+      render();
+    });
+
+    document.querySelector("#todayFilter").addEventListener("click", () => {
+      state.query = "";
+      state.filter = "today";
+      searchInput.value = "";
+      render();
+      window.scrollTo({ top: document.querySelector(".board").offsetTop - 18, behavior: "smooth" });
+    });
+
+    document.querySelector("#showAll").addEventListener("click", () => {
+      state.query = "";
+      state.filter = "all";
+      state.category = "all";
+      searchInput.value = "";
+      render();
+      window.scrollTo({ top: document.querySelector(".board").offsetTop - 18, behavior: "smooth" });
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const task = taskFromForm();
+      const index = state.tasks.findIndex((item) => item.id === task.id);
+
+      if (index >= 0) state.tasks[index] = task;
+      else state.tasks.unshift(task);
+
+      await persistTasks("已儲存暫停紀錄");
+      resetForm();
+      render();
+    });
+
+    document.querySelector("#resetForm").addEventListener("click", resetForm);
+
+    progressInput.addEventListener("input", updateProgressHint);
+    tagsInput.addEventListener("input", renderTags);
+    tagsInput.addEventListener("focus", renderTags);
+    tagsInput.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") hideTagSuggestions();
+    });
+
+    tagSuggestions.addEventListener("mousedown", (event) => {
+      event.preventDefault();
+      const button = event.target.closest("[data-tag]");
+      if (!button) return;
+      replaceCurrentTag(button.dataset.tag);
+    });
+
+    document.addEventListener("mousedown", (event) => {
+      if (event.target === tagsInput || tagSuggestions.contains(event.target)) return;
+      hideTagSuggestions();
+    });
+
+    document.querySelectorAll("[data-progress]").forEach((button) => {
+      button.addEventListener("click", () => {
+        progressInput.value = button.dataset.progress;
+        updateProgressHint();
+      });
+    });
+
+    results.addEventListener("click", async (event) => {
+      const button = event.target.closest("button[data-action]");
+      const card = event.target.closest(".task");
+      if (!button || !card) return;
+
+      const task = state.tasks.find((item) => item.id === card.dataset.id);
+      if (!task) return;
+
+      if (button.dataset.action === "edit") {
+        fillForm(task);
+        return;
+      }
+
+      if (button.dataset.action === "advance") {
+        task.progress = clampProgress(task.progress + 10);
+        task.status = task.progress >= 100 ? "done" : "active";
+        task.updatedAt = new Date().toISOString();
+        await persistTasks("進度已更新");
+      }
+
+      if (button.dataset.action === "done") {
+        task.progress = 100;
+        task.status = "done";
+        task.updatedAt = new Date().toISOString();
+        await persistTasks("已標記完成");
+      }
+
+      if (button.dataset.action === "delete") {
+        state.tasks = state.tasks.filter((item) => item.id !== task.id);
+        await persistTasks("已刪除紀錄");
+      }
+
+      render();
+    });
+
+    document.querySelector("#exportData").addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify({
+        exportedAt: new Date().toISOString(),
+        app: "What to do",
+        version: 1,
+        categories: categories(),
+        tags: tags(),
+        tasks: state.tasks
+      }, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `what-to-do-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast("已匯出資料");
+    });
+
+    document.querySelector("#importData").addEventListener("click", () => filePicker.click());
+
+    filePicker.addEventListener("change", async () => {
+      const file = filePicker.files[0];
+      if (!file) return;
+
+      try {
+        const imported = JSON.parse(await file.text());
+        const importedTasks = Array.isArray(imported) ? imported : imported.tasks;
+        if (!Array.isArray(importedTasks)) throw new Error("Invalid file");
+
+        state.tasks = importedTasks.map((task) => ({
+          id: task.id || crypto.randomUUID(),
+          title: String(task.title || "未命名任務"),
+          note: String(task.note || ""),
+          next: String(task.next || ""),
+          category: String(task.category || ""),
+          status: ["paused", "active", "blocked", "done"].includes(task.status) ? task.status : "paused",
+          progress: clampProgress(task.progress),
+          tags: Array.isArray(task.tags) ? task.tags.map(String) : [],
+          updatedAt: task.updatedAt || new Date().toISOString()
+        }));
+        state.savedCategories = [...new Set([
+          ...state.savedCategories,
+          ...(Array.isArray(imported.categories) ? imported.categories.map(String) : []),
+          ...state.tasks.map(taskCategory)
+        ])];
+        state.savedTags = [...new Set([
+          ...state.savedTags,
+          ...(Array.isArray(imported.tags) ? imported.tags.map(String) : []),
+          ...state.tasks.flatMap((task) => task.tags || [])
+        ])];
+        await persistTasks("已匯入資料");
+        render();
+      } catch {
+        showToast("匯入失敗，請確認 JSON 格式");
+      } finally {
+        filePicker.value = "";
+      }
+    });
+
+    autoBackupButton.addEventListener("click", async () => {
+      if ("showSaveFilePicker" in window) {
+        try {
+          backupHandle = await window.showSaveFilePicker({
+            suggestedName: backupFileName(),
+            types: [{
+              description: "JSON backup",
+              accept: { "application/json": [".json"] }
+            }]
+          });
+          backupDownloadFallback = false;
+          await writeAutoBackup();
+          showToast("已啟用自動備份");
+        } catch (error) {
+          if (error.name !== "AbortError") showToast("自動備份啟用失敗");
+        }
+        return;
+      }
+
+      backupDownloadFallback = true;
+      localStorage.setItem(BACKUP_META_KEY, JSON.stringify({
+        enabled: true,
+        mode: "download",
+        updatedAt: new Date().toISOString()
+      }));
+      await writeAutoBackup();
+      showToast("已啟用下載式備份");
+    });
+
+    connectFirebaseButton.addEventListener("click", async () => {
+      try {
+        await connectFirebase();
+        showToast("Firebase 已登入");
+      } catch {
+        setSyncStatus("登入失敗，請檢查 Email、Password、Authentication 與網路");
+        showToast("登入失敗");
+      }
+    });
+
+    disconnectFirebaseButton.addEventListener("click", disconnectFirebase);
+
+    loadCloudButton.addEventListener("click", async () => {
+      try {
+        await loadCloudSync();
+      } catch {
+        showToast("雲端載入失敗");
+      }
+    });
+
+    syncNowButton.addEventListener("click", async () => {
+      if (!state.firebase.enabled || !state.firebase.user) {
+        document.querySelector("#syncTitle").scrollIntoView({ behavior: "smooth", block: "center" });
+        showToast("請先登入 Firebase");
+        return;
+      }
+
+      try {
+        await pushFirebaseSync();
+        showToast("已同步到雲端");
+      } catch {
+        showToast("同步失敗");
+      }
+    });
+
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      installAppButton.hidden = false;
+    });
+
+    installAppButton.addEventListener("click", async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      installAppButton.hidden = true;
+    });
+
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+    }
+
+    saveTasks(false);
+    firebaseEmailInput.value = localStorage.getItem(FIREBASE_EMAIL_KEY) || "";
+    const backupMeta = localStorage.getItem(BACKUP_META_KEY);
+    if (backupMeta) {
+      try {
+        const parsed = JSON.parse(backupMeta);
+        if (parsed.mode === "download") {
+          backupDownloadFallback = true;
+          backupStatus.textContent = "自動備份：下載模式";
+        } else if (parsed.enabled) {
+          backupStatus.textContent = "自動備份曾啟用，請按一次重新授權";
+        }
+      } catch {
+        backupStatus.textContent = "尚未啟用自動備份";
+      }
+    }
+    render();
+    updateProgressHint();
+    searchInput.focus();
+  </script>
+</body>
+</html>
