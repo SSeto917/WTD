@@ -1089,6 +1089,14 @@
       return id;
     }
 
+    function deviceLabel() {
+      const ua = navigator.userAgent || "";
+      const isIPad = /iPad/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      if (isIPad) return "iPad端";
+      if (/Mobi|Android|iPhone|iPod/i.test(ua)) return "手機端";
+      return "電腦端";
+    }
+
     function setSyncStatus(message) {
       syncStatus.textContent = message;
     }
@@ -1097,7 +1105,7 @@
       const code = error?.code || "unknown";
       const details = error?.message ? ` (${error.message})` : "";
       if (code === "permission-denied") {
-        return "Firestore 規則擋住了，請確認 rules 是 whatToDo/{userId} 且 request.auth.uid == userId。";
+        return "Firestore 規則擋住了，請確認 rules 允許 whatToDo/{userId} 和 whatToDo/{userId}/tasks/{taskId}。";
       }
       if (code === "unauthenticated" || code === "auth/user-token-expired") {
         return "登入狀態已失效，請重新登入。";
@@ -1207,6 +1215,7 @@
         taskCount: state.tasks.length,
         updatedAt,
         deviceId: deviceId(),
+        lastSavedDevice: deviceLabel(),
         ownerUid: state.firebase.user.uid,
         ownerEmail: state.firebase.user.email || ""
       };
@@ -1231,7 +1240,7 @@
       });
 
       await commitFirestoreWrites(modules, writes);
-      setSyncStatus(`雲端已更新：${formatDate(updatedAt)}，共 ${state.tasks.length} 筆`);
+      setSyncStatus(`雲端已更新：${formatDate(updatedAt)}，共 ${state.tasks.length} 筆。上次存檔：${deviceLabel()}`);
     }
 
     async function loadCloudSync() {
@@ -1252,11 +1261,11 @@
           tags: meta.tags,
           updatedAt: meta.updatedAt
         });
-        setSyncStatus(`已套用雲端資料：${formatDate(meta.updatedAt)}，共 ${remoteTasks.length} 筆`);
+        setSyncStatus(`已套用雲端資料：${formatDate(meta.updatedAt)}，共 ${remoteTasks.length} 筆。上次存檔：${meta.lastSavedDevice || "未知端"}`);
       } else if (metaSnapshot.exists() && Array.isArray(metaSnapshot.data().tasks)) {
         const remote = metaSnapshot.data();
         applyCloudPayload(remote);
-        setSyncStatus(`已套用舊版雲端備份：${formatDate(remote.updatedAt)}`);
+        setSyncStatus(`已套用舊版雲端備份：${formatDate(remote.updatedAt)}。上次存檔：${remote.lastSavedDevice || "未知端"}`);
       } else {
         setSyncStatus("雲端目前沒有資料。");
       }
